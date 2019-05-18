@@ -49,5 +49,21 @@ def test_adding_the_same_set_twice_is_a_no_op():
     assert first == second
 
 
-def test_repr():
+def test_repr_singleton():
     assert repr(ds.MutableDisjointSet(1)) == "disjoint({1})"
+
+# Mutation testing results
+
+
+def test_disjoint_sets_are_not_equal_to_regular_sets():
+    assert ds.MutableDisjointSet(1) != set([1])
+
+
+def test_repr_two_sets():
+    assert repr(ds.MutableDisjointSet(1, 2)) in [
+        "disjoint({1}, {2})", "disjoint({2}, {1})"]
+
+
+def test_repr_set_of_two():
+    assert repr(ds.MutableDisjointSet().add_set(1, 2)) in [
+        "disjoint({1, 2})", "disjoint({2, 1})"]
