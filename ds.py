@@ -17,12 +17,12 @@ class MutableDisjointSet(object):
             self._add(elem)
 
     def __eq__(self, other):
-        other_sets = getattr(other, "sets", None)
-        return callable(other_sets) and self.sets() == other_sets()
+        other_segments = getattr(other, "segments", None)
+        return callable(other_segments) and self.segments() == other_segments()
 
     def __repr__(self):
         set_strings = []
-        for s in self.sets():
+        for s in self.segments():
             string = "{{{}}}".format(", ".join(str(elem) for elem in s))
             set_strings.append(string)
 
@@ -38,7 +38,7 @@ class MutableDisjointSet(object):
     def elems(self):
         return frozenset(self._dict.keys())
 
-    def sets(self):
+    def segments(self):
         keys = sorted(self._dict.keys(), key=self._root)
         return frozenset([
             frozenset(values)

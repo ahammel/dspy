@@ -10,8 +10,8 @@ def test_empty_disjoint_set_has_no_elems():
     assert ds.MutableDisjointSet().elems() == set()
 
 
-def test_empty_disjoint_set_has_no_sets():
-    assert ds.MutableDisjointSet().sets() == set()
+def test_empty_disjoint_set_has_no_segments():
+    assert ds.MutableDisjointSet().segments() == set()
 
 
 def test_singleton_disjoint_set_has_one_elem():
@@ -19,7 +19,7 @@ def test_singleton_disjoint_set_has_one_elem():
 
 
 def test_singleton_disjoint_set_has_one_a_singleton_set():
-    actual = ds.MutableDisjointSet(1).sets()
+    actual = ds.MutableDisjointSet(1).segments()
     expected = frozenset([frozenset([1])])
     assert actual == expected
 
@@ -27,7 +27,7 @@ def test_singleton_disjoint_set_has_one_a_singleton_set():
 def test_disjoint_set_with_a_union():
     actual = ds.MutableDisjointSet(1, 2, 3)\
         .add_set(1, 2)\
-        .sets()
+        .segments()
     expected = frozenset([
         frozenset([1, 2]),
         frozenset([3]),
@@ -79,7 +79,7 @@ def test_repr_set_of_two():
 @st.composite
 def disjoints(draw, elements=st.integers(), max_size=1000, max_unions=1000):
     elems = draw(st.lists(elements, max_size=max_size))
-    elem_strategy = st.sampled_from(elems)
+    elem_strategy = st.sampled_from(elems) if elems else st.nothing()
     unions = draw(
         st.lists(
             st.tuples(elem_strategy, elem_strategy),
@@ -94,8 +94,8 @@ def disjoints(draw, elements=st.integers(), max_size=1000, max_unions=1000):
 
 
 @given(disjoints())  # pylint:disable=no-value-for-parameter
-def test_all_disjoint_sets_are_disjoint(disjoint):
+def test_property_disjoint_sets_are_disjoint(disjoint):
     elems = disjoint.elems()
-    sets = disjoint.sets()
+    segments = disjoint.segments()
     for elem in elems:
-        assert len([s for s in sets if elem in s]) == 1
+        assert len([segment for segment in segments if elem in segment]) == 1
