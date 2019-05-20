@@ -3,3 +3,4 @@ python/
 htmlcov/
 .coverage
 .mutmut-cache
+.hypothesis/

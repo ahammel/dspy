@@ -1,3 +1,8 @@
+from functools import reduce
+
+from hypothesis import given
+import hypothesis.strategies as st
+
 from .context import ds
 
 
@@ -67,3 +72,30 @@ def test_repr_two_sets():
 def test_repr_set_of_two():
     assert repr(ds.MutableDisjointSet().add_set(1, 2)) in [
         "disjoint({1, 2})", "disjoint({2, 1})"]
+
+# Property tests
+
+
+@st.composite
+def disjoints(draw, elements=st.integers(), max_size=1000, max_unions=1000):
+    elems = draw(st.lists(elements, max_size=max_size))
+    elem_strategy = st.sampled_from(elems)
+    unions = draw(
+        st.lists(
+            st.tuples(elem_strategy, elem_strategy),
+            max_size=max_unions
+        )
+    )
+    return reduce(
+        lambda acc, arg: acc.add_set(*arg),
+        unions,
+        ds.MutableDisjointSet(*elems)
+    )
+
+
+@given(disjoints())  # pylint:disable=no-value-for-parameter
+def test_all_disjoint_sets_are_disjoint(disjoint):
+    elems = disjoint.elems()
+    sets = disjoint.sets()
+    for elem in elems:
+        assert len([s for s in sets if elem in s]) == 1
