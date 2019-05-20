@@ -45,6 +45,13 @@ class MutableDisjointSet(object):
             for _, values
             in groupby(keys, key=self._root)])
 
+    def size_of_segment(self, elem):
+        if elem not in self._dict:
+            return None
+
+        root = self._root(elem)
+        return self._dict[root]["size"]
+
     def _add(self, elem):
         if elem not in self._dict:
             self._dict[elem] = {"parent": elem, "size": 1}

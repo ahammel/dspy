@@ -57,6 +57,10 @@ def test_adding_the_same_set_twice_is_a_no_op():
 def test_repr_singleton():
     assert repr(ds.MutableDisjointSet(1)) == "disjoint({1})"
 
+
+def test_size_of_segment_returns_None_when_elem_not_in_disjoint():
+    assert ds.MutableDisjointSet().size_of_segment("banana") is None
+
 # Mutation testing results
 
 
@@ -99,3 +103,16 @@ def test_property_disjoint_sets_are_disjoint(disjoint):
     segments = disjoint.segments()
     for elem in elems:
         assert len([segment for segment in segments if elem in segment]) == 1
+
+
+@given(disjoints())  # pylint:disable=no-value-for-parameter
+def test_property_size_of_segment_is_correct(disjoint):
+    elems = disjoint.elems()
+    segments = disjoint.segments()
+    for elem in elems:
+        segments_with_elem = [s for s in segments if elem in s]
+        if len(segments_with_elem) != 1:
+            raise Exception("Disjoint set is not disjoint!")
+        segment = segments_with_elem[0]
+
+        assert disjoint.size_of_segment(elem) == len(segment)
